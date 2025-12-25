@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { LaunchWindow } from "./components/launch/LaunchWindow";
 import { SourceSelector } from "./components/launch/SourceSelector";
+import { AreaSelector } from "./components/launch/AreaSelector";
+import { CameraBubble } from "./components/launch/CameraBubble";
 import VideoEditor from "./components/video-editor/VideoEditor";
 
 export default function App() {
@@ -10,7 +12,7 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     const type = params.get('windowType') || '';
     setWindowType(type);
-    if (type === 'hud-overlay' || type === 'source-selector') {
+    if (type === 'hud-overlay' || type === 'source-selector' || type === 'area-selector' || type === 'camera-bubble') {
       document.body.style.background = 'transparent';
       document.documentElement.style.background = 'transparent';
       document.getElementById('root')?.style.setProperty('background', 'transparent');
@@ -22,9 +24,13 @@ export default function App() {
       return <LaunchWindow />;
     case 'source-selector':
       return <SourceSelector />;
+    case 'area-selector':
+      return <AreaSelector />;
+    case 'camera-bubble':
+      return <CameraBubble />;
     case 'editor':
       return <VideoEditor />;
-      default:
+    default:
       return (
         <div className="w-full h-full bg-background text-foreground">
           <h1>Openscreen</h1>

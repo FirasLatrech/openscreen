@@ -100,6 +100,20 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
           },
         },
       });
+
+      if (selectedSource.microphoneId) {
+        try {
+          const audioStream = await navigator.mediaDevices.getUserMedia({
+            audio: { deviceId: { exact: selectedSource.microphoneId } }
+          });
+          audioStream.getAudioTracks().forEach(track => {
+            mediaStream.addTrack(track);
+          });
+        } catch (audioError) {
+          console.warn('Failed to capture microphone audio:', audioError);
+        }
+      }
+
       stream.current = mediaStream;
       if (!stream.current) {
         throw new Error("Media stream is not available.");

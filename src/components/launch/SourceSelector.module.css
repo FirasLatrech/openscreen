@@ -39,3 +39,62 @@
   color: #a1a1aa;
   font-size: 0.75rem;
 }
+
+.microphoneSection {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(38, 38, 48, 0.6);
+  border-radius: 10px;
+  border: 1px solid rgba(60, 60, 80, 0.22);
+}
+
+.microphoneHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.micIcon {
+  width: 16px;
+  height: 16px;
+  color: #71717a;
+}
+
+.micIconActive {
+  width: 16px;
+  height: 16px;
+  color: #34B27B;
+}
+
+.micLabel {
+  font-size: 0.8rem;
+  color: #d4d4d8;
+  font-weight: 500;
+}
+
+.micSelect {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(24, 24, 32, 0.9);
+  border: 1px solid rgba(60, 60, 80, 0.3);
+  border-radius: 8px;
+  color: #f4f4f5;
+  font-size: 0.8rem;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.micSelect:hover {
+  border-color: rgba(60, 60, 80, 0.5);
+}
+
+.micSelect:focus {
+  border-color: #34B27B;
+}
+
+.micSelect option {
+  background: #18181b;
+  color: #f4f4f5;
+}

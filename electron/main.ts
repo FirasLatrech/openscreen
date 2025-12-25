@@ -1,8 +1,8 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage } from 'electron'
+import { app, BrowserWindow, Tray, Menu, nativeImage, shell } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import fs from 'node:fs/promises'
-import { createHudOverlayWindow, createEditorWindow, createSourceSelectorWindow } from './windows'
+import { createHudOverlayWindow, createEditorWindow, createSourceSelectorWindow, createAreaSelectorWindow, createCameraBubbleWindow, closeCameraBubbleWindow, moveCameraBubbleWindow, resizeCameraBubbleWindow } from './windows'
 import { registerIpcHandlers } from './ipc/handlers'
 
 
@@ -42,6 +42,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 // Window references
 let mainWindow: BrowserWindow | null = null
 let sourceSelectorWindow: BrowserWindow | null = null
+let areaSelectorWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 let selectedSourceName = ''
 
@@ -138,29 +139,60 @@ app.on('activate', () => {
 
 // Register all IPC handlers when app is ready
 app.whenReady().then(async () => {
-    // Listen for HUD overlay quit event (macOS only)
     const { ipcMain } = await import('electron');
+    
     ipcMain.on('hud-overlay-close', () => {
       app.quit();
     });
+
+    ipcMain.handle('open-area-selector', () => {
+      if (areaSelectorWindow && !areaSelectorWindow.isDestroyed()) {
+        areaSelectorWindow.focus();
+        return;
+      }
+      areaSelectorWindow = createAreaSelectorWindow();
+      areaSelectorWindow.on('closed', () => {
+        areaSelectorWindow = null;
+      });
+    });
+
+    ipcMain.handle('open-camera-bubble', (_, deviceId: string, displayId?: string) => {
+      createCameraBubbleWindow(deviceId, displayId);
+    });
+
+    ipcMain.handle('close-camera-bubble', () => {
+      closeCameraBubbleWindow();
+    });
+
+    ipcMain.handle('move-camera-bubble', (_, x: number, y: number) => {
+      moveCameraBubbleWindow(x, y);
+    });
+
+    ipcMain.handle('resize-camera-bubble', (_, size: number) => {
+      resizeCameraBubbleWindow(size);
+    });
+
+    ipcMain.handle('open-recordings-folder', async () => {
+      await shell.openPath(RECORDINGS_DIR);
+    });
+
     createTray()
     updateTrayMenu()
-  // Ensure recordings directory exists
-  await ensureRecordingsDir()
+    await ensureRecordingsDir()
 
-  registerIpcHandlers(
-    createEditorWindowWrapper,
-    createSourceSelectorWindowWrapper,
-    () => mainWindow,
-    () => sourceSelectorWindow,
-    (recording: boolean, sourceName: string) => {
-      selectedSourceName = sourceName
-      if (!tray) createTray();
-      updateTrayMenu(recording);
-      if (!recording) {
-        if (mainWindow) mainWindow.restore();
+    registerIpcHandlers(
+      createEditorWindowWrapper,
+      createSourceSelectorWindowWrapper,
+      () => mainWindow,
+      () => sourceSelectorWindow,
+      (recording: boolean, sourceName: string) => {
+        selectedSourceName = sourceName
+        if (!tray) createTray();
+        updateTrayMenu(recording);
+        if (!recording) {
+          if (mainWindow) mainWindow.restore();
+        }
       }
-    }
-  )
-  createWindow()
+    )
+    createWindow()
 })

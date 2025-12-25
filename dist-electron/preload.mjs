@@ -59,5 +59,29 @@ electron.contextBridge.exposeInMainWorld("electronAPI", {
   },
   getPlatform: () => {
     return electron.ipcRenderer.invoke("get-platform");
+  },
+  openAreaSelector: () => {
+    return electron.ipcRenderer.invoke("open-area-selector");
+  },
+  selectAreaRegion: (region) => {
+    return electron.ipcRenderer.invoke("select-area-region", region);
+  },
+  getSelectedAreaRegion: () => {
+    return electron.ipcRenderer.invoke("get-selected-area-region");
+  },
+  openCameraBubble: (deviceId, displayId) => {
+    return electron.ipcRenderer.invoke("open-camera-bubble", deviceId, displayId);
+  },
+  closeCameraBubble: () => {
+    return electron.ipcRenderer.invoke("close-camera-bubble");
+  },
+  moveCameraBubble: (x, y) => {
+    return electron.ipcRenderer.invoke("move-camera-bubble", x, y);
+  },
+  resizeCameraBubble: (size) => {
+    return electron.ipcRenderer.invoke("resize-camera-bubble", size);
+  },
+  openRecordingsFolder: () => {
+    return electron.ipcRenderer.invoke("open-recordings-folder");
   }
 });

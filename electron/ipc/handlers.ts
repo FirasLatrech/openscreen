@@ -4,7 +4,21 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { RECORDINGS_DIR } from '../main'
 
-let selectedSource: any = null
+let selectedSource: {
+  id: string;
+  name: string;
+  thumbnail: string | null;
+  display_id: string;
+  appIcon: string | null;
+  microphoneId: string | null;
+} | null = null
+
+let selectedAreaRegion: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+} | null = null
 
 export function registerIpcHandlers(
   createEditorWindow: () => void,
@@ -211,5 +225,14 @@ export function registerIpcHandlers(
 
   ipcMain.handle('get-platform', () => {
     return process.platform;
+  });
+
+  ipcMain.handle('select-area-region', (_, region) => {
+    selectedAreaRegion = region;
+    return { success: true };
+  });
+
+  ipcMain.handle('get-selected-area-region', () => {
+    return selectedAreaRegion;
   });
 }

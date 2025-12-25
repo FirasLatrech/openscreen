@@ -63,4 +63,28 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getPlatform: () => {
     return ipcRenderer.invoke('get-platform')
   },
+  openAreaSelector: () => {
+    return ipcRenderer.invoke('open-area-selector')
+  },
+  selectAreaRegion: (region: { x: number; y: number; width: number; height: number }) => {
+    return ipcRenderer.invoke('select-area-region', region)
+  },
+  getSelectedAreaRegion: () => {
+    return ipcRenderer.invoke('get-selected-area-region')
+  },
+  openCameraBubble: (deviceId: string, displayId?: string) => {
+    return ipcRenderer.invoke('open-camera-bubble', deviceId, displayId)
+  },
+  closeCameraBubble: () => {
+    return ipcRenderer.invoke('close-camera-bubble')
+  },
+  moveCameraBubble: (x: number, y: number) => {
+    return ipcRenderer.invoke('move-camera-bubble', x, y)
+  },
+  resizeCameraBubble: (size: number) => {
+    return ipcRenderer.invoke('resize-camera-bubble', size)
+  },
+  openRecordingsFolder: () => {
+    return ipcRenderer.invoke('open-recordings-folder')
+  },
 })

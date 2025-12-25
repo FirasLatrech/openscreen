@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
-import { MdCheck } from "react-icons/md";
+import { MdCheck, MdMic, MdMicOff } from "react-icons/md";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Card } from "../ui/card";
 import styles from "./SourceSelector.module.css";
@@ -13,10 +13,17 @@ interface DesktopSource {
   appIcon: string | null;
 }
 
+interface AudioDevice {
+  deviceId: string;
+  label: string;
+}
+
 export function SourceSelector() {
   const [sources, setSources] = useState<DesktopSource[]>([]);
   const [selectedSource, setSelectedSource] = useState<DesktopSource | null>(null);
   const [loading, setLoading] = useState(true);
+  const [microphones, setMicrophones] = useState<AudioDevice[]>([]);
+  const [selectedMicrophone, setSelectedMicrophone] = useState<string>("none");
 
   useEffect(() => {
     async function fetchSources() {
@@ -48,12 +55,36 @@ export function SourceSelector() {
     fetchSources();
   }, []);
 
+  useEffect(() => {
+    async function fetchMicrophones() {
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const audioInputs = devices
+          .filter(device => device.kind === 'audioinput')
+          .map(device => ({
+            deviceId: device.deviceId,
+            label: device.label || `Microphone ${device.deviceId.slice(0, 5)}`
+          }));
+        setMicrophones(audioInputs);
+      } catch (error) {
+        console.error('Error loading microphones:', error);
+      }
+    }
+    fetchMicrophones();
+  }, []);
+
   const screenSources = sources.filter(s => s.id.startsWith('screen:'));
   const windowSources = sources.filter(s => s.id.startsWith('window:'));
 
   const handleSourceSelect = (source: DesktopSource) => setSelectedSource(source);
   const handleShare = async () => {
-    if (selectedSource) await window.electronAPI.selectSource(selectedSource);
+    if (selectedSource) {
+      await window.electronAPI.selectSource({
+        ...selectedSource,
+        microphoneId: selectedMicrophone === "none" ? null : selectedMicrophone
+      });
+    }
   };
 
   if (loading) {
@@ -147,6 +178,29 @@ export function SourceSelector() {
             </TabsContent>
           </div>
         </Tabs>
+
+        <div className={styles.microphoneSection}>
+          <div className={styles.microphoneHeader}>
+            {selectedMicrophone === "none" ? (
+              <MdMicOff className={styles.micIcon} />
+            ) : (
+              <MdMic className={styles.micIconActive} />
+            )}
+            <span className={styles.micLabel}>Microphone</span>
+          </div>
+          <select
+            value={selectedMicrophone}
+            onChange={(e) => setSelectedMicrophone(e.target.value)}
+            className={styles.micSelect}
+          >
+            <option value="none">No microphone</option>
+            {microphones.map(mic => (
+              <option key={mic.deviceId} value={mic.deviceId}>
+                {mic.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
       <div className="border-t border-zinc-800 p-2 w-full max-w-xl">
         <div className="flex justify-center gap-2">

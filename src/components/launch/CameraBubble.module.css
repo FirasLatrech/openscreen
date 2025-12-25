@@ -1,0 +1,69 @@
+.container {
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: grab;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease;
+  position: relative;
+  background: #1a1a1a;
+  transform: scale(0.8);
+  opacity: 0;
+}
+
+.container.visible {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.container.dragging {
+  cursor: grabbing;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  background: #1a1a1a;
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+.border {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+
+.closeBtn {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(30, 30, 35, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.15s ease;
+  z-index: 10;
+}
+
+.closeBtn.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.closeBtn:hover {
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+}
+
