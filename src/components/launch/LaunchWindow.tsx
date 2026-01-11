@@ -225,6 +225,19 @@ export function LaunchWindow() {
     });
   };
 
+  const handleMicrophoneChange = async (deviceId: string) => {
+    setSelectedMicrophone(deviceId);
+    setShowMicDropdown(false);
+    
+    if (selectedSource) {
+      await window.electronAPI.selectSource({
+        ...selectedSource,
+        microphoneId: deviceId === "none" ? null : deviceId,
+        cameraId: selectedCamera === "none" ? null : selectedCamera
+      });
+    }
+  };
+
   const handleStartRecording = async () => {
     if (!selectedSource && currentSources.length > 0) {
       await handleSourceSelect(currentSources[0]);
@@ -337,7 +350,11 @@ export function LaunchWindow() {
             onClick={handleMicDropdownToggle}
             disabled={recording}
           >
-            {selectedMicrophone === "none" ? <MdMicOff size={14} /> : <MdMic size={14} />}
+            {selectedMicrophone === "none" ? (
+              <MdMicOff size={14} style={{ color: 'rgba(255, 255, 255, 0.4)' }} />
+            ) : (
+              <MdMic size={14} />
+            )}
             <span className={styles.mediaLabel}>
               {selectedMicrophone === "none" ? "No mic" : truncateLabel(selectedMicLabel, 10)}
             </span>
@@ -348,10 +365,7 @@ export function LaunchWindow() {
             <div className={styles.dropdown} style={micDropdownStyle}>
               <button
                 className={`${styles.dropdownItem} ${selectedMicrophone === "none" ? styles.selected : ''}`}
-                onClick={() => {
-                  setSelectedMicrophone("none");
-                  setShowMicDropdown(false);
-                }}
+                onClick={() => handleMicrophoneChange("none")}
               >
                 <MdMicOff size={14} />
                 <span>No microphone</span>
@@ -361,10 +375,7 @@ export function LaunchWindow() {
                 <button
                   key={mic.deviceId}
                   className={`${styles.dropdownItem} ${selectedMicrophone === mic.deviceId ? styles.selected : ''}`}
-                  onClick={() => {
-                    setSelectedMicrophone(mic.deviceId);
-                    setShowMicDropdown(false);
-                  }}
+                  onClick={() => handleMicrophoneChange(mic.deviceId)}
                 >
                   <MdMic size={14} />
                   <span>{mic.label}</span>

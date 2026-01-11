@@ -875,7 +875,35 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(({
         className="hidden"
         preload="metadata"
         playsInline
-        onLoadedMetadata={handleLoadedMetadata}
+        muted={false}
+        onLoadedMetadata={(e) => {
+          const video = e.currentTarget;
+          video.volume = 1;
+          video.muted = false;
+          
+          try {
+            const audioTracks = (video as any).audioTracks;
+            if (audioTracks && audioTracks.length > 0) {
+              console.log(`[VideoPlayback] Video has ${audioTracks.length} audio track(s)`);
+            } else {
+              const stream = (video as any).captureStream?.();
+              if (stream) {
+                const audioTracks = stream.getAudioTracks();
+                if (audioTracks.length > 0) {
+                  console.log(`[VideoPlayback] Video stream has ${audioTracks.length} audio track(s)`);
+                } else {
+                  console.warn('[VideoPlayback] Video has no audio tracks');
+                }
+              } else {
+                console.warn('[VideoPlayback] Could not check audio tracks');
+              }
+            }
+          } catch (err) {
+            console.warn('[VideoPlayback] Error checking audio tracks:', err);
+          }
+          
+          handleLoadedMetadata(e);
+        }}
         onDurationChange={e => {
           onDurationChange(e.currentTarget.duration);
         }}

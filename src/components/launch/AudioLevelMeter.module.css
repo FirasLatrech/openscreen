@@ -1,0 +1,19 @@
+.meter {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+  padding: 0 4px;
+}
+
+.bar {
+  width: 2px;
+  background: rgba(52, 178, 123, 0.4);
+  border-radius: 1px;
+  transition: height 0.1s ease-out, opacity 0.1s ease-out;
+  min-height: 2px;
+}
+
+.bar.active {
+  background: #34B27B;
+}

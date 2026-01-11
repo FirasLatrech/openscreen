@@ -178,6 +178,7 @@
   cursor: pointer;
   transition: all 0.15s;
   text-align: left;
+  position: relative;
 }
 
 .dropdownItem:hover {
